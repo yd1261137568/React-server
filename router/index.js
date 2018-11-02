@@ -12,27 +12,45 @@ const router = new Router();
 router.use(express.urlencoded({extended: true}));
 
 //创建登录路由
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
   const {username,password} = req.body;
   //判断用户的输入是否合法
   if(!username || !password) {
     //数据不合法
     res.json({
       "code": 2,
-      "msg": "用户输入不合法"
+      "msg": "您输入的不合法,请重新输入"
     });
+    // res.json('用户名或密码错误')
     return;
   }
   try {
     //去数据库中查找该用户名是否存在
-    const data = Users.findOne({username});
-    if(data === req.body.username){
-      req.json('恭喜你~~登录成功了')
+    const data =await Users.findOne({username,password:md5(password)});
+    if(data){
+      res.json({
+        code:0,
+        data:{
+          _id:data.id,
+          username:data.username,
+          password:data.password
+        }
+      });
+    }else{
+      res.json({
+        "code": 1,
+        "msg": "用户名或密码错误"
+        //该用户不存在,请先注册
+      });
     }
 
   } catch (ev) {
     //方法出错
-   res.json('用户名或密码错误!')
+    res.json({
+      "code": 3,
+      "msg": "网络不稳定，请重新试试~"
+    });
+    // res.json('网络不稳定，请重新试试~')
   }
 
 });
