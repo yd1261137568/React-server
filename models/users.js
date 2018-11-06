@@ -15,6 +15,11 @@ const usersSchema = new Schema({
     type:String,
     required:true
   },
+  header:String,
+  post:String,
+  info:String,
+  company:String,
+  salary:String,
 });
 //创建模型对象
 const Users = mongoose.model('Users',usersSchema);
